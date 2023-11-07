@@ -12,7 +12,7 @@ See https://render.com/docs/deploy-node-fastify-app or follow the steps below:
 
 Create a new web service with the following values:
   * Build Command: `npm install`
-  * Start Command: `node app.js`
+  * Start Command: `node app.ts`
 
 Or simply click:
 

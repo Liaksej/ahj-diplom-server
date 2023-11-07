@@ -1,24 +1,35 @@
-const port = process.env.PORT || 3000;
-const host = ("RENDER" in process.env) ? `0.0.0.0` : `localhost`;
+import { FastifyReply, FastifyRequest } from "fastify";
+import { webSocket } from "./plugins/webSocket";
+import ws from "@fastify/websocket";
 
-const fastify = require('fastify')({
-  logger: true
-})
+const port = process.env.PORT || 3001;
+const host = "RENDER" in process.env ? `0.0.0.0` : `localhost`;
 
-fastify.get('/', function (request, reply) {
-  reply.type('text/html').send(html)
-})
+const fastify = require("fastify")({
+  logger: true,
+});
 
-fastify.listen({host: host, port: port }, function (err, address) {
-  if (err) {
-    fastify.log.error(err)
-    process.exit(1)
+fastify.register(ws);
+fastify.register(webSocket);
+
+// fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
+//   reply.type("text/html").send(html);
+// });
+
+const start = async () => {
+  try {
+    await fastify.listen({ host: host, port: port });
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
   }
-})
+};
+
+start();
 
 const html = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Hello from Render!</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
@@ -73,4 +84,4 @@ const html = `
     </section>
   </body>
 </html>
-`
+`;
