@@ -20,6 +20,7 @@
   "homepage": "https://github.com/render-examples/fastify-hello-world#readme",
   "dependencies": {
     "@fastify/websocket": "^8.2.0",
+    "@prisma/client": "5.5.2",
     "fastify": "^4.24.3"
   },
   "engines": {

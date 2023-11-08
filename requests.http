@@ -1,0 +1,3 @@
+### Simple WebSocket Request
+// It is possible to send messages to server right from the Services tool window
+WEBSOCKET ws://127.0.0.1:300/api/ws/
