@@ -11,27 +11,24 @@ datasource db {
 }
 
 model User {
-  id        String     @id @default(uuid())
-  name      String
-  email     String     @unique
-  password  String
-  messages  Message[]
+  id       String    @id @default(uuid())
+  name     String
+  email    String    @unique
+  password String
+  messages Message[]
 }
 
 model Message {
-  id        String     @id @default(uuid())
-  date      DateTime   @default(now())
-  geoData   Json?
-  text      String
-  photoUrl  String?
-  audioUrl  String?
-  fileUrl   String?
-  imageUrl  String?
-  pinned    Boolean
-  reminder  DateTime?
-  userId    String
-  user      User       @relation(fields: [userId], references: [id])
+  id       String    @id @default(uuid())
+  date     DateTime  @default(now())
+  geoData  Json?
+  text     String
+  photoUrl String?
+  audioUrl String?
+  fileUrl  String?
+  imageUrl String?
+  pinned   Boolean
+  reminder DateTime?
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
 }
-
-
-
