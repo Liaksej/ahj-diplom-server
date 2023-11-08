@@ -11,7 +11,13 @@ export async function webSocket(
   //   }
   // });
   fastify.get("/api/ws/", { websocket: true }, async (connection, req) => {
-    connection.socket.send("Hi from server");
+    connection.socket.send(
+      JSON.stringify({
+        text: "Hi from Server!",
+        date: new Date(),
+        author: "server",
+      }),
+    );
     connection.socket.on("message", (message) => {
       connection.socket.send(message.toString());
     });
