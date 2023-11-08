@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  messages  Message[]
+}
+
+model Message {
+  id        String     @id @default(uuid())
+  date      DateTime   @default(now())
+  geoData   Json?
+  text      String
+  photoUrl  String?
+  audioUrl  String?
+  fileUrl   String?
+  imageUrl  String?
+  pinned    Boolean
+  reminder  DateTime?
+  userId    String
+  user      User       @relation(fields: [userId], references: [id])
+}
+
+
+

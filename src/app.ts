@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { webSocket } from "./plugins/webSocket";
-import ws from "@fastify/websocket";
+import fastifyWebsocket, { SocketStream } from "@fastify/websocket";
 
 const port = process.env.PORT || 3001;
 const host = "RENDER" in process.env ? `0.0.0.0` : `localhost`;
@@ -9,7 +9,7 @@ const fastify = require("fastify")({
   logger: true,
 });
 
-fastify.register(ws);
+fastify.register(fastifyWebsocket);
 fastify.register(webSocket);
 
 // fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
