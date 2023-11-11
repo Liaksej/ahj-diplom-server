@@ -1,6 +1,11 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { webSocket } from "./plugins/webSocket";
 import fastifyWebsocket, { SocketStream } from "@fastify/websocket";
+import fastifyAuth from "@fastify/auth";
+import { root } from "./plugins/root";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import { PrismaClient } from "@prisma/client";
 
 const port = process.env.PORT || 3001;
 const host = "RENDER" in process.env ? `0.0.0.0` : `localhost`;
@@ -9,7 +14,69 @@ const fastify = require("fastify")({
   logger: true,
 });
 
+const prisma = new PrismaClient();
+
+fastify
+  .decorate(
+    "verifyJWT",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const token = request.headers.authorization?.replace("Bearer ", "");
+      if (!token) {
+        reply.code(401).send({ error: "Token not provided" });
+        return;
+      }
+
+      try {
+        const { email } = jwt.verify(token, process.env.JWT_SECRET!) as {
+          email: string;
+        };
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: email,
+          },
+        });
+
+        if (!user) {
+          reply.code(401).send({ error: "Invalid credentials" });
+          return;
+        }
+      } catch (err) {
+        reply.code(401).send({ error: "Invalid token" });
+        return;
+      }
+    },
+  )
+  .decorate(
+    "verifyUserAndPassword",
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { username, password } = request.body as {
+        username: string;
+        password: string;
+      };
+      const user = await prisma.user.findUnique({
+        where: {
+          email: username,
+        },
+      });
+
+      if (user && (await bcrypt.compare(password, user.password))) {
+        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!, {
+          expiresIn: "24h",
+        });
+
+        request.headers.authorization = `Bearer ${token}`;
+
+        return;
+      }
+
+      reply.code(401).send({ error: "Invalid credentials" });
+      return;
+    },
+  )
+  .register(fastifyAuth);
 fastify.register(fastifyWebsocket);
+fastify.register(root);
 fastify.register(webSocket);
 
 // fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {

@@ -1,31 +1,48 @@
-import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
+import {
+  FastifyInstance,
+  FastifyPluginOptions,
+  FastifyReply,
+  FastifyRequest,
+} from "fastify";
 import { SocketStream } from "@fastify/websocket";
 import * as querystring from "querystring";
 import { Prisma, PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 interface Message {
   text: string;
 }
 
+interface MyCustomMethods {
+  verifyJWT(
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: any,
+  ): Promise<void>;
+
+  verifyUserAndPassword(
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: any,
+  ): Promise<void>;
+}
+
+type MyFastifyInstance = FastifyInstance & MyCustomMethods;
+
 const prisma = new PrismaClient();
 
+const sessions = new Map<string, string>();
+
 export async function webSocket(
-  fastify: FastifyInstance,
+  fastify: MyFastifyInstance,
   options: FastifyPluginOptions,
 ) {
   fastify.get(
     "/api/ws/",
     {
       websocket: true,
-      preValidation: async (request, reply) => {
-        const query = request.query as { [key: string]: string };
-        if (query["x-fastify-header"] !== "fastify is awesome !") {
-          await reply.code(401).send({
-            error: "Unauthorized",
-          });
-          return;
-        }
-      },
+      preHandler: fastify.auth([fastify.verifyJWT]),
     },
     async (connection, req) => {
       const savedMessages = await prisma.message.findMany({

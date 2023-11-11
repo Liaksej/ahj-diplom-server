@@ -19,16 +19,20 @@
   },
   "homepage": "https://github.com/render-examples/fastify-hello-world#readme",
   "dependencies": {
+    "@fastify/auth": "^4.4.0",
     "@fastify/websocket": "^8.2.0",
     "@prisma/client": "5.5.2",
     "@types/bcrypt": "^5.0.2",
     "bcrypt": "^5.1.1",
-    "fastify": "^4.24.3"
+    "fastify": "^4.24.3",
+    "fastify-plugin": "^4.5.1",
+    "jsonwebtoken": "^9.0.2"
   },
   "engines": {
     "node": "18.x"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.8.10",
     "@types/ws": "^8.5.8",
     "prisma": "^5.5.2",
