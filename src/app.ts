@@ -58,7 +58,6 @@ fastify
         email: string;
         password: string;
       };
-      console.log(email, password);
       const user = await prisma.user.findUnique({
         where: {
           email: email,
