@@ -31,33 +31,18 @@ export async function root(
   options: FastifyPluginOptions,
 ) {
   fastify.post(
-    "/api/auth",
+    "/api/auth/",
     {
-      preHandler: fastify.auth([fastify.verifyJWT]),
+      preHandler: fastify.auth([fastify.verifyUserAndPassword]),
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { email, password } = request.body as {
-        email: string;
-        password: string;
-      };
-      const user = await prisma.user.findUnique({
-        where: {
-          email: email,
-        },
-      });
-
-      if (user && (await bcrypt.compare(password, user.password))) {
-        const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!, {
-          expiresIn: "24h",
-        });
-
-        reply.code(200).send({ token });
-
+      try {
+        reply.code(200).send({ message: "Welcome on board" });
+        return;
+      } catch (e) {
+        reply.code(401).send({ error: "Invalid credentials" });
         return;
       }
-
-      reply.code(401).send({ error: "Invalid credentials" });
-      return;
     },
   );
 }

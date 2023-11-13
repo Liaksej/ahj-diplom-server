@@ -44,7 +44,7 @@ export async function webSocket(
       websocket: true,
       preHandler: fastify.auth([fastify.verifyJWT]),
     },
-    async (connection, req) => {
+    async (connection, request: FastifyRequest) => {
       const savedMessages = await prisma.message.findMany({
         take: 100,
         orderBy: {
