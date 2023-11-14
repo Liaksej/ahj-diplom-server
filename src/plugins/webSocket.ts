@@ -4,11 +4,7 @@ import {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
-import { SocketStream } from "@fastify/websocket";
-import * as querystring from "querystring";
 import { Prisma, PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
 
 interface Message {
   text: string;

@@ -42,7 +42,7 @@ fastify
         });
 
         if (!user) {
-          reply.code(401).send({ error: "Invalid credentials" });
+          reply.code(401).send({ error: "Invalid credentials.ini" });
           return;
         }
       } catch (err) {
@@ -74,7 +74,7 @@ fastify
         return;
       }
 
-      reply.code(401).send({ error: "Invalid credentials" });
+      reply.code(401).send({ error: "Invalid credentials.ini" });
       return;
     },
   )

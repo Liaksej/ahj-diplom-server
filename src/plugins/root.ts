@@ -40,7 +40,7 @@ export async function root(
         reply.code(200).send({ message: "Welcome on board" });
         return;
       } catch (e) {
-        reply.code(401).send({ error: "Invalid credentials" });
+        reply.code(401).send({ error: "Invalid credentials.ini" });
         return;
       }
     },
