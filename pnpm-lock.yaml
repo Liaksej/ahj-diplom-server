@@ -11,12 +11,18 @@ dependencies:
   '@aws-sdk/credential-provider-node':
     specifier: ^3.450.0
     version: 3.450.0
+  '@aws-sdk/lib-storage':
+    specifier: ^3.458.0
+    version: 3.458.0(@aws-sdk/client-s3@3.450.0)
   '@aws-sdk/s3-request-presigner':
     specifier: ^3.451.0
     version: 3.451.0
   '@fastify/auth':
     specifier: ^4.4.0
     version: 4.4.0
+  '@fastify/busboy':
+    specifier: ^2.1.0
+    version: 2.1.0
   '@fastify/cookie':
     specifier: ^9.1.0
     version: 9.1.0
@@ -390,6 +396,22 @@ packages:
       tslib: 2.6.2
     dev: false
 
+  /@aws-sdk/lib-storage@3.458.0(@aws-sdk/client-s3@3.450.0):
+    resolution: {integrity: sha512-wSP/sjG+SH6YHQINLePzu6fgeTo4ibqQSpnvNF52lJWJY/1lRE4qYuLQFLH2WEWG3FuDzEIsJiu3CwHm0cc6mw==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      '@aws-sdk/client-s3': ^3.0.0
+    dependencies:
+      '@aws-sdk/client-s3': 3.450.0
+      '@smithy/abort-controller': 2.0.13
+      '@smithy/middleware-endpoint': 2.2.0
+      '@smithy/smithy-client': 2.1.15
+      buffer: 5.6.0
+      events: 3.3.0
+      stream-browserify: 3.0.0
+      tslib: 2.6.2
+    dev: false
+
   /@aws-sdk/middleware-bucket-endpoint@3.449.0:
     resolution: {integrity: sha512-gH+IEdDfhzTmQLdWwfc23A40EhvvAhk8taXUu3DX/lXl+2lBqd4qCoGk8vfUtwh9y1kbRDnhLq04XM2DPvvj2w==}
     engines: {node: '>=14.0.0'}
@@ -718,6 +740,11 @@ packages:
     dependencies:
       fastify-plugin: 4.5.1
       reusify: 1.0.4
+    dev: false
+
+  /@fastify/busboy@2.1.0:
+    resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
+    engines: {node: '>=14'}
     dev: false
 
   /@fastify/cookie@9.1.0:
@@ -1480,6 +1507,13 @@ packages:
       base64-js: 1.5.1
       ieee754: 1.2.1
       isarray: 1.0.0
+    dev: false
+
+  /buffer@5.6.0:
+    resolution: {integrity: sha512-/gDYp/UtU0eA1ys8bOs9J6a+E/KWIY+DZ+Q2WESNUA0jFRsJOc0SNUO6xJ5SGA1xueg3NL65W6s+NY5l9cunuw==}
+    dependencies:
+      base64-js: 1.5.1
+      ieee754: 1.2.1
     dev: false
 
   /buffer@6.0.3:
@@ -2354,6 +2388,13 @@ packages:
   /split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
+    dev: false
+
+  /stream-browserify@3.0.0:
+    resolution: {integrity: sha512-H73RAHsVBapbim0tU2JwwOiXUj+fikfiaoYAKHF3VJfA0pe2BCzkhAHBlLG6REzE+2WNZcxOXjK7lkso+9euLA==}
+    dependencies:
+      inherits: 2.0.4
+      readable-stream: 3.6.2
     dev: false
 
   /string-width@4.2.3:

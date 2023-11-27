@@ -21,8 +21,10 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.450.0",
     "@aws-sdk/credential-provider-node": "^3.450.0",
+    "@aws-sdk/lib-storage": "^3.458.0",
     "@aws-sdk/s3-request-presigner": "^3.451.0",
     "@fastify/auth": "^4.4.0",
+    "@fastify/busboy": "^2.1.0",
     "@fastify/cookie": "^9.1.0",
     "@fastify/secure-session": "^7.1.0",
     "@fastify/websocket": "^8.2.0",

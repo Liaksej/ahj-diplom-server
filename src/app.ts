@@ -7,6 +7,20 @@ import { root } from "./plugins/root";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import * as process from "process";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+}
+
+declare module "fastify" {
+  export interface FastifyRequest {
+    user?: User;
+  }
+}
 
 const port = process.env.PORT || 8080;
 const host = "RENDER" in process.env ? `0.0.0.0` : `localhost`;
@@ -24,29 +38,38 @@ fastify
   .decorate(
     "verifyJWT",
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const query = request.query as { [key: string]: string };
-      if (!query.token) {
-        reply.code(401).send({ error: "Token not provided" });
-        return;
-      }
-
-      try {
-        const { email } = jwt.verify(query.token, process.env.JWT_SECRET!) as {
-          email: string;
-        };
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email: email,
-          },
-        });
-
-        if (!user) {
-          reply.code(401).send({ error: "Invalid credentials.ini" });
+      let { token } = request.query as { [key: string]: string | undefined };
+      if (!token) {
+        token = request.headers.authorization?.split(" ")[1];
+        if (!token) {
+          reply.code(401).send({ error: "Token not provided" });
           return;
         }
-      } catch (err) {
-        reply.code(401).send({ error: "Invalid token" });
+
+        try {
+          const { email } = jwt.verify(token, process.env.JWT_SECRET!) as {
+            email: string;
+          };
+
+          const user = await prisma.user.findUnique({
+            where: {
+              email: email,
+            },
+          });
+
+          if (user) {
+            request.user = user;
+          }
+
+          if (!user) {
+            reply.code(401).send({ error: "Invalid credentials.ini" });
+            return;
+          }
+        } catch (err) {
+          reply.code(401).send({ error: "Invalid token" });
+          return;
+        }
+        reply.code(401).send({ error: "Token not provided" });
         return;
       }
     },
@@ -65,7 +88,7 @@ fastify
       });
       if (user && (await bcrypt.compare(password, user.password))) {
         const token = jwt.sign({ email: user.email }, process.env.JWT_SECRET!, {
-          expiresIn: "24h",
+          expiresIn: "30days",
         });
 
         reply.code(200).send({

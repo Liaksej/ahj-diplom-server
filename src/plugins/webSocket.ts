@@ -4,11 +4,10 @@ import {
   FastifyReply,
   FastifyRequest,
 } from "fastify";
-import { Prisma, PrismaClient } from "@prisma/client";
-
-interface Message {
-  text: string;
-}
+import { PrismaClient } from "@prisma/client";
+import { main as S3 } from "../S3";
+import fs from "fs";
+import path from "path";
 
 interface MyCustomMethods {
   verifyJWT(
@@ -28,8 +27,6 @@ type MyFastifyInstance = FastifyInstance & MyCustomMethods;
 
 const prisma = new PrismaClient();
 
-const sessions = new Map<string, string>();
-
 export async function webSocket(
   fastify: MyFastifyInstance,
   options: FastifyPluginOptions,
@@ -48,7 +45,7 @@ export async function webSocket(
         },
         where: {
           user: {
-            email: "1gqFP@example.com",
+            email: request.user?.email,
           },
         },
         include: {
@@ -61,28 +58,6 @@ export async function webSocket(
       });
 
       connection.socket.send(JSON.stringify(savedMessages));
-      connection.socket.on("message", async (message) => {
-        const incomintText = JSON.parse(message.toString()).text;
-        const addMessage = await prisma.message.create({
-          data: {
-            text: incomintText,
-            pinned: false,
-            user: {
-              connect: {
-                email: "1gqFP@example.com",
-              },
-            },
-          },
-          include: {
-            user: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        });
-        connection.socket.send(JSON.stringify(addMessage));
-      });
     },
   );
 }
