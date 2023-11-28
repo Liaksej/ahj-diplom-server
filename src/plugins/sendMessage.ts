@@ -5,9 +5,9 @@ import {
   FastifyRequest,
 } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import Busboy, { BusboyHeaders } from "@fastify/busboy";
 import { main } from "../S3";
 import multipart from "@fastify/multipart";
+import { ws } from "./webSocket";
 
 interface MyCustomMethods {
   verifyJWT(
@@ -34,9 +34,7 @@ export async function sendMessage(
   fastify.register(multipart);
   fastify.post(
     "/api/send-message/",
-    {
-      preHandler: fastify.auth([fastify.verifyJWT]),
-    },
+    { preHandler: fastify.auth([fastify.verifyJWT]) },
     async (request: FastifyRequest, reply: FastifyReply) => {
       let photoUrl: string | undefined;
       let text: string | undefined;
@@ -73,7 +71,14 @@ export async function sendMessage(
             },
           },
         },
+        include: {
+          user: true,
+        },
       });
+
+      if (ws) {
+        ws.socket.send(JSON.stringify(message));
+      }
 
       reply.code(201).send({ message });
     },
