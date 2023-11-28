@@ -8,6 +8,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 import * as process from "process";
+import { sendMessage } from "./plugins/sendMessage";
+import cors from "@fastify/cors";
 
 interface User {
   id: string;
@@ -33,6 +35,10 @@ const prisma = new PrismaClient();
 
 // Я хочу организовать временную session, которая будет хранить токен, на Fastify, можешь мне написать пример кода?
 
+fastify.register(cors, {
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+});
 fastify.register(fastifyCookie);
 fastify
   .decorate(
@@ -59,6 +65,7 @@ fastify
 
           if (user) {
             request.user = user;
+            return;
           }
 
           if (!user) {
@@ -105,6 +112,7 @@ fastify
 fastify.register(fastifyWebsocket);
 fastify.register(root);
 fastify.register(webSocket);
+fastify.register(sendMessage);
 
 // fastify.get("/", async (request: FastifyRequest, reply: FastifyReply) => {
 //   reply.type("text/html").send(html);

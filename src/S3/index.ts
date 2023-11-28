@@ -49,4 +49,6 @@ export const main = async ({
   });
 
   await s3Client.send(putObjectAclCommand);
+
+  return `https://${params.Bucket}.s3.us-east-2.amazonaws.com/${params.Key}`;
 };

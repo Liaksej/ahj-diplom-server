@@ -6,7 +6,8 @@ import {
 } from "fastify";
 import { PrismaClient } from "@prisma/client";
 import Busboy, { BusboyHeaders } from "@fastify/busboy";
-import { main } from "@/S3";
+import { main } from "../S3";
+import multipart from "@fastify/multipart";
 
 interface MyCustomMethods {
   verifyJWT(
@@ -26,57 +27,55 @@ type MyFastifyInstance = FastifyInstance & MyCustomMethods;
 
 const prisma = new PrismaClient();
 
-export async function root(
+export async function sendMessage(
   fastify: MyFastifyInstance,
   options: FastifyPluginOptions,
 ) {
+  fastify.register(multipart);
   fastify.post(
     "/api/send-message/",
     {
       preHandler: fastify.auth([fastify.verifyJWT]),
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const busboy = new Busboy({ headers: request.headers } as {
-        headers: BusboyHeaders;
-      });
-      try {
-        busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
-          console.log("File [" + filename + "]: filename: " + filename);
+      let photoUrl: string | undefined;
+      let text: string | undefined;
 
-          file.on("error", (error) => {
-            console.error("Error occurred while streaming the file: ", error);
-            // Also consider cleaning up and/or signalling the error to the client here.
-          });
+      const parts = await request.parts();
 
-          main({ filename, file });
-        });
-      } catch (e) {
-        reply.code(401).send({ error: "Invalid credentials.ini" });
+      for await (const part of parts) {
+        if (part.type === "file" && part.filename && part.file) {
+          try {
+            photoUrl = await main({ filename: part.filename, file: part.file });
+            console.log(photoUrl);
+          } catch (e) {
+            console.error("Error: ", e);
+            // reply.code(500).send({ error: "Invalid credentials.ini" });
+          }
+        }
+        if (part.type === "field")
+          if (part.fieldname === "text" && part.value) {
+            text = part.value as string;
+          }
       }
 
-      // busboy.on("finish", async () => {
-      //   const incomingJSON = JSON.parse(incomingFields["message"]);
-      //
-      //   const addMessage = await prisma.message.create({
-      //     data: {
-      //       text: incomingJSON.text,
-      //       pinned: false,
-      //       photoUrl: photoUrl,
-      //       user: {
-      //         connect: {
-      //           email: request.user?.email,
-      //         },
-      //       },
-      //     },
-      //     include: {
-      //       user: {
-      //         select: {
-      //           name: true,
-      //         },
-      //       },
-      //     },
-      //   });
-      // });
+      if (!text || !request.user?.email) {
+        return;
+      }
+      const message = await prisma.message.create({
+        data: {
+          text: text,
+          photoUrl: photoUrl,
+          pinned: false,
+          user: {
+            connect: {
+              email: request.user?.email,
+            },
+          },
+        },
+      });
+
+      reply.code(201).send({ message });
     },
   );
 }
