@@ -45,10 +45,10 @@ export async function sendMessage(
         if (part.type === "file" && part.filename && part.file) {
           try {
             photoUrl = await main({ filename: part.filename, file: part.file });
-            console.log(photoUrl);
           } catch (e) {
             console.error("Error: ", e);
-            // reply.code(500).send({ error: "Invalid credentials.ini" });
+            reply.code(500).send({ error: "Something went wrong" });
+            return;
           }
         }
         if (part.type === "field")
@@ -57,12 +57,12 @@ export async function sendMessage(
           }
       }
 
-      if (!text || !request.user?.email) {
+      if ((!text || !photoUrl) && !request.user?.email) {
         return;
       }
       const message = await prisma.message.create({
         data: {
-          text: text,
+          text: text || "",
           photoUrl: photoUrl,
           pinned: false,
           user: {
