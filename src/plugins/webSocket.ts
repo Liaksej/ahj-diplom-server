@@ -59,24 +59,6 @@ export async function webSocket(
       });
 
       connection.socket.send(JSON.stringify(savedMessages));
-
-      connection.socket.on("message", async (message) => {
-        const newMessage = await prisma.message.findUnique({
-          where: {
-            id: message.toString(),
-          },
-          include: {
-            user: {
-              select: {
-                name: true,
-              },
-            },
-          },
-        });
-        console.log(newMessage);
-
-        connection.socket.send([newMessage]);
-      });
     },
   );
 }

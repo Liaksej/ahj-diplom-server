@@ -31,7 +31,11 @@ export async function sendMessage(
   fastify: MyFastifyInstance,
   options: FastifyPluginOptions,
 ) {
-  fastify.register(multipart);
+  fastify.register(multipart, {
+    limits: {
+      fileSize: 50 * 1024 * 1024,
+    },
+  });
   fastify.post(
     "/api/send-message/",
     { preHandler: fastify.auth([fastify.verifyJWT]) },
@@ -57,7 +61,7 @@ export async function sendMessage(
           }
       }
 
-      if ((!text || !photoUrl) && !request.user?.email) {
+      if (!(request.user?.email && (text || photoUrl))) {
         return;
       }
       const message = await prisma.message.create({
@@ -78,9 +82,8 @@ export async function sendMessage(
 
       if (ws) {
         ws.socket.send(JSON.stringify(message));
+        reply.code(201).send({ message });
       }
-
-      reply.code(201).send({ message });
     },
   );
 }
