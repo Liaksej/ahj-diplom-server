@@ -23,10 +23,8 @@ model Message {
   date     DateTime  @default(now())
   geoData  Json?
   text     String
-  photoUrl String?
-  audioUrl String?
   fileUrl  String?
-  imageUrl String?
+  mime     String?
   pinned   Boolean
   reminder DateTime?
   userId   String

@@ -38,17 +38,19 @@ export async function sendMessage(
   });
   fastify.post(
     "/api/send-message/",
-    { preHandler: fastify.auth([fastify.verifyJWT]) },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      let photoUrl: string | undefined;
+      let fileUrl: string | undefined;
+      let mime: string | undefined;
       let text: string | undefined;
 
-      const parts = await request.parts();
+      const parts = request.parts();
+      const email = request.cookies.email;
 
       for await (const part of parts) {
         if (part.type === "file" && part.filename && part.file) {
           try {
-            photoUrl = await main({ filename: part.filename, file: part.file });
+            fileUrl = await main({ filename: part.filename, file: part.file });
+            mime = part.mimetype as string;
           } catch (e) {
             console.error("Error: ", e);
             reply.code(500).send({ error: "Something went wrong" });
@@ -61,28 +63,25 @@ export async function sendMessage(
           }
       }
 
-      if (!(request.user?.email && (text || photoUrl))) {
+      if (!(email && (text || fileUrl))) {
         return;
       }
       const message = await prisma.message.create({
         data: {
           text: text || "",
-          photoUrl: photoUrl,
+          fileUrl: fileUrl || "",
+          mime: mime || "",
           pinned: false,
-          user: {
-            connect: {
-              email: request.user?.email,
-            },
-          },
+          user: { connect: { email: email as string } },
         },
-        include: {
-          user: true,
-        },
+        include: { user: true },
       });
 
       if (ws) {
         ws.socket.send(JSON.stringify(message));
         reply.code(201).send({ message });
+      } else {
+        reply.code(500).send({ error: "Something went wrong" });
       }
     },
   );

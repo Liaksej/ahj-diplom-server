@@ -1,11 +1,4 @@
-import {
-  CreateMultipartUploadCommand,
-  UploadPartCommand,
-  CompleteMultipartUploadCommand,
-  AbortMultipartUploadCommand,
-  S3Client,
-  PutObjectAclCommand,
-} from "@aws-sdk/client-s3";
+import { S3Client, PutObjectAclCommand } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import { BusboyFileStream } from "@fastify/busboy";

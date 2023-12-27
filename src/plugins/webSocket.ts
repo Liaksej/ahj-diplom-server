@@ -5,48 +5,43 @@ import {
   FastifyRequest,
 } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import fastifyWebsocket from "@fastify/websocket";
 
-interface MyCustomMethods {
-  verifyJWT(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    done: any,
-  ): Promise<void>;
-
-  verifyUserAndPassword(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    done: any,
-  ): Promise<void>;
+interface QueryRequest extends FastifyRequest {
+  Querystring: {
+    email?: string;
+  };
 }
-
-type MyFastifyInstance = FastifyInstance & MyCustomMethods;
 
 const prisma = new PrismaClient();
 
 export let ws: any = null;
 
 export async function webSocket(
-  fastify: MyFastifyInstance,
+  fastify: FastifyInstance,
   options: FastifyPluginOptions,
 ) {
   fastify.get(
     "/api/ws/",
     {
       websocket: true,
-      preHandler: fastify.auth([fastify.verifyJWT]),
     },
     async (connection, request: FastifyRequest) => {
       ws = connection;
+
+      if (!request.query || !(request.query as { email: string }).email) {
+        return;
+      }
+
+      const email = (request.query as { email: string }).email;
+
       const savedMessages = await prisma.message.findMany({
-        take: 100,
+        take: 20,
         orderBy: {
           date: "asc",
         },
         where: {
           user: {
-            email: request.user?.email,
+            email: email,
           },
         },
         include: {
