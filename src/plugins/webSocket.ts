@@ -34,26 +34,37 @@ export async function webSocket(
 
       const email = (request.query as { email: string }).email;
 
-      const savedMessages = await prisma.message.findMany({
-        take: 20,
-        orderBy: {
-          date: "asc",
-        },
-        where: {
-          user: {
-            email: email,
-          },
-        },
-        include: {
-          user: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      });
+      connection.socket.on("message", async function incoming(message) {
+        const { event, data } = JSON.parse(message.toString());
 
-      connection.socket.send(JSON.stringify(savedMessages));
+        if (event === "getComments") {
+          const offset = (data.offset as number) || 0;
+          const savedMessages = await prisma.message.findMany({
+            skip: offset,
+            take: 9,
+            orderBy: {
+              date: "desc",
+            },
+            where: {
+              user: {
+                email: email,
+              },
+            },
+            include: {
+              user: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          });
+
+          if (savedMessages.length > 0) {
+            savedMessages.reverse();
+            connection.socket.send(JSON.stringify(savedMessages));
+          }
+        }
+      });
     },
   );
 }
