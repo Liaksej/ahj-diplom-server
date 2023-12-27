@@ -10,26 +10,10 @@ import multipart from "@fastify/multipart";
 import { ws } from "./webSocket";
 import { uuid } from "uuidv4";
 
-interface MyCustomMethods {
-  verifyJWT(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    done: any,
-  ): Promise<void>;
-
-  verifyUserAndPassword(
-    request: FastifyRequest,
-    reply: FastifyReply,
-    done: any,
-  ): Promise<void>;
-}
-
-type MyFastifyInstance = FastifyInstance & MyCustomMethods;
-
 const prisma = new PrismaClient();
 
 export async function sendMessage(
-  fastify: MyFastifyInstance,
+  fastify: FastifyInstance,
   options: FastifyPluginOptions,
 ) {
   fastify.register(multipart, {
@@ -43,6 +27,7 @@ export async function sendMessage(
       let fileUrl: string | undefined;
       let mime: string | undefined;
       let text: string | undefined;
+      let fileName: string | undefined;
 
       const parts = request.parts();
       const email = request.cookies.email;
@@ -58,10 +43,14 @@ export async function sendMessage(
             return;
           }
         }
-        if (part.type === "field")
+        if (part.type === "field") {
           if (part.fieldname === "text" && part.value) {
             text = part.value as string;
           }
+          if (part.fieldname === "fileName" && part.value) {
+            fileName = part.value as string;
+          }
+        }
       }
 
       if (!(email && (text || fileUrl))) {
@@ -71,6 +60,7 @@ export async function sendMessage(
         data: {
           text: text || "",
           fileUrl: fileUrl || "",
+          fileName: fileName || "",
           mime: mime || "",
           pinned: false,
           user: { connect: { email: email as string } },
