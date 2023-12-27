@@ -5,9 +5,10 @@ import {
   FastifyRequest,
 } from "fastify";
 import { PrismaClient } from "@prisma/client";
-import { main } from "../S3";
+import { S3 } from "../S3";
 import multipart from "@fastify/multipart";
 import { ws } from "./webSocket";
+import { uuid } from "uuidv4";
 
 interface MyCustomMethods {
   verifyJWT(
@@ -49,7 +50,7 @@ export async function sendMessage(
       for await (const part of parts) {
         if (part.type === "file" && part.filename && part.file) {
           try {
-            fileUrl = await main({ filename: part.filename, file: part.file });
+            fileUrl = await new S3(uuid()).uploadToS3(part.file);
             mime = part.mimetype as string;
           } catch (e) {
             console.error("Error: ", e);

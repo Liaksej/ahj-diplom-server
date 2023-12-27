@@ -24,6 +24,7 @@ model Message {
   geoData  Json?
   text     String
   fileUrl  String?
+  fileName String?
   mime     String?
   pinned   Boolean
   reminder DateTime?
