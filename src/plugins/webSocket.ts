@@ -32,24 +32,39 @@ export async function webSocket(
         return;
       }
 
-      const email = (request.query as { email: string }).email;
+      const { email } = request.query as QueryRequest["Querystring"] & {
+        email: string;
+      };
 
       connection.socket.on("message", async function incoming(message) {
         const { event, data } = JSON.parse(message.toString());
 
         if (event === "getComments") {
           const offset = (data.offset as number) || 0;
+          const query = (data.q as string) || "";
           const savedMessages = await prisma.message.findMany({
             skip: offset,
-            take: 9,
+            take: 10,
             orderBy: {
               date: "desc",
             },
-            where: {
-              user: {
-                email: email,
-              },
-            },
+            where: query
+              ? {
+                  AND: [
+                    { user: { email: email } },
+                    {
+                      OR: [
+                        {
+                          text: {
+                            contains: query,
+                            mode: "insensitive",
+                          },
+                        },
+                      ],
+                    },
+                  ],
+                }
+              : { user: { email: email } },
             include: {
               user: {
                 select: {
