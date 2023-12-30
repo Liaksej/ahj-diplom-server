@@ -134,3 +134,4 @@ dist
 
 .idea
 credentials.ini
+requests.http
