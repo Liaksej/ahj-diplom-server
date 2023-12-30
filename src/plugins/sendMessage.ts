@@ -28,6 +28,7 @@ export async function sendMessage(
       let mime: string | undefined;
       let text: string | undefined;
       let fileName: string | undefined;
+      let geodata = undefined;
 
       const parts = request.parts();
       const email = request.cookies.email;
@@ -50,6 +51,9 @@ export async function sendMessage(
           if (part.fieldname === "fileName" && part.value) {
             fileName = part.value as string;
           }
+          if (part.fieldname === "geodata" && part.value) {
+            geodata = part.value as string;
+          }
         }
       }
 
@@ -62,6 +66,7 @@ export async function sendMessage(
           fileUrl: fileUrl || "",
           fileName: fileName || "",
           mime: mime || "",
+          geoData: (!!geodata && JSON.parse(geodata)) || undefined,
           pinned: false,
           user: { connect: { email: email as string } },
         },
