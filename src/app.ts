@@ -4,7 +4,8 @@ import * as process from "process";
 import { sendMessage } from "./plugins/sendMessage";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
-import type { FastifyCookieOptions } from "@fastify/cookie";
+import { FastifySSEPlugin } from "fastify-sse-v2";
+import { serverSideEvent } from "@/plugins/serverSideEvent";
 
 interface User {
   id: string;
@@ -35,7 +36,9 @@ fastify.register(cookie, {
   hook: "onRequest",
 });
 fastify.register(fastifyWebsocket);
+fastify.register(FastifySSEPlugin);
 fastify.register(webSocket);
+fastify.register(serverSideEvent);
 fastify.register(sendMessage);
 
 const start = async () => {
