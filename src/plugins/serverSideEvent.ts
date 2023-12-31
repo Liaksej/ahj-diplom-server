@@ -12,14 +12,15 @@ export async function serverSideEvent(
   fastify: FastifyInstance,
   options: FastifyPluginOptions,
 ) {
-  let lastFileUrls: string | undefined;
-
   fastify.get(
     "/api/sse/",
     async function (request: FastifyRequest, reply: FastifyReply) {
       if (!request.query || !(request.query as { email: string }).email) {
         return;
       }
+
+      let lastFileUrls: string | undefined;
+      let lastId = 0;
 
       reply.sse(
         (async function* source() {
@@ -35,6 +36,7 @@ export async function serverSideEvent(
               },
               select: {
                 fileName: true,
+                id: true,
                 fileUrl: true,
                 mime: true,
                 date: true,
@@ -44,7 +46,7 @@ export async function serverSideEvent(
             const filesUrlsJson = JSON.stringify(filesUrls);
 
             if (lastFileUrls !== filesUrlsJson) {
-              yield { data: filesUrlsJson };
+              yield { id: String(lastId++), data: filesUrlsJson };
               lastFileUrls = filesUrlsJson;
             }
             await new Promise((resolve) => setTimeout(resolve, 2000));

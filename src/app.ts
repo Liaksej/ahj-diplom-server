@@ -5,7 +5,7 @@ import { sendMessage } from "./plugins/sendMessage";
 import cors from "@fastify/cors";
 import cookie from "@fastify/cookie";
 import { FastifySSEPlugin } from "fastify-sse-v2";
-import { serverSideEvent } from "@/plugins/serverSideEvent";
+import { serverSideEvent } from "./plugins/serverSideEvent";
 
 interface User {
   id: string;
