@@ -29,7 +29,7 @@ const fastify = require("fastify")({
 
 fastify.register(cors, {
   origin: true,
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST", "OPTIONS", "DELETE"],
   credentials: true,
 });
 fastify.register(cookie, {
