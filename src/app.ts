@@ -28,7 +28,7 @@ const fastify = require("fastify")({
 });
 
 fastify.register(cors, {
-  origin: true,
+  origin: process.env.CLIENT,
   methods: ["GET", "POST", "OPTIONS", "DELETE"],
   credentials: true,
 });
