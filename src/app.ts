@@ -25,6 +25,7 @@ const host: string = "RENDER" in process.env ? `0.0.0.0` : `localhost`;
 
 const fastify = require("fastify")({
   logger: true,
+  bodyLimit: 50 * 1024 * 1024,
 });
 
 fastify.register(cors, {
