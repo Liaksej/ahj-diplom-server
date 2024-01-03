@@ -7,7 +7,7 @@ import {
 import { PrismaClient } from "@prisma/client";
 import { S3 } from "../S3";
 import multipart from "@fastify/multipart";
-import { ws } from "./webSocket";
+import { connections } from "./webSocket";
 import { uuid } from "uuidv4";
 
 const prisma = new PrismaClient();
@@ -73,8 +73,8 @@ export async function sendMessage(
         include: { user: true },
       });
 
-      if (ws) {
-        ws.socket.send(JSON.stringify(message));
+      if (connections) {
+        connections.forEach((ws) => ws.socket.send(JSON.stringify(message)));
         reply.code(201).send({ message });
       } else {
         reply.code(500).send({ error: "Something went wrong" });
@@ -130,11 +130,19 @@ export async function sendMessage(
             id: id,
           },
         });
-        reply.code(204).send();
       } catch (e) {
         console.error("Error: ", e);
         reply.code(500).send({ error: "Something went wrong" });
         return;
+      }
+
+      if (connections) {
+        connections.forEach((ws) =>
+          ws.socket.send(JSON.stringify({ event: "messageDeleted", data: id })),
+        );
+        reply.code(204).send();
+      } else {
+        reply.code(500).send({ error: "Something went wrong" });
       }
     },
   );

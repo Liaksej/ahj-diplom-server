@@ -9,7 +9,7 @@ interface QueryRequest extends FastifyRequest {
 
 const prisma = new PrismaClient();
 
-export let ws: any = null;
+export const connections: any[] = [];
 
 export async function webSocket(
   fastify: FastifyInstance,
@@ -21,7 +21,7 @@ export async function webSocket(
       websocket: true,
     },
     async (connection, request: FastifyRequest) => {
-      ws = connection;
+      connections.push(connection);
 
       if (!request.query || !(request.query as { email: string }).email) {
         return;
@@ -71,7 +71,9 @@ export async function webSocket(
 
           if (savedMessages.length > 0) {
             savedMessages.reverse();
-            connection.socket.send(JSON.stringify(savedMessages));
+            connections.forEach((ws) =>
+              ws.socket.send(JSON.stringify(savedMessages)),
+            );
           }
         }
       });
