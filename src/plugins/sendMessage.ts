@@ -9,7 +9,6 @@ import { S3 } from "../S3";
 import multipart from "@fastify/multipart";
 import { ws } from "./webSocket";
 import { uuid } from "uuidv4";
-import { stringifiedJson } from "aws-sdk/clients/customerprofiles";
 
 const prisma = new PrismaClient();
 

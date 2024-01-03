@@ -1,9 +1,4 @@
-import {
-  FastifyInstance,
-  FastifyPluginOptions,
-  FastifyReply,
-  FastifyRequest,
-} from "fastify";
+import { FastifyInstance, FastifyPluginOptions, FastifyRequest } from "fastify";
 import { PrismaClient } from "@prisma/client";
 
 interface QueryRequest extends FastifyRequest {
