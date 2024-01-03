@@ -4,7 +4,6 @@ import {
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
-import { defaultProvider } from "@aws-sdk/credential-provider-node";
 import { BusboyFileStream } from "@fastify/busboy";
 
 export class S3 {
@@ -13,9 +12,10 @@ export class S3 {
   constructor(filename: string) {
     this.s3Client = new S3Client({
       region: "us-east-2",
-      credentials: defaultProvider({
-        profile: "default",
-      }),
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+      },
     });
     this.params = {
       Bucket: "liaksejs-bucket",
