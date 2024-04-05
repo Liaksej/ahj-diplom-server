@@ -2,8 +2,8 @@
 
 **backend-part** -----> frontend-part [here](https://github.com/Liaksej/ahj-diplom-client/tree/main/ahj-diplom)
 
-Веб-приложение для ведения дневника, хранения информации и поиска.
+Web-based diary for storage and search application.
 
-Сохраняйте заметки, загружайте фотографии, видео, аудио, ставьте геотеги, ищите нужные заметки по тексту и скачивайте сохраненные файлы.
+Save notes, upload photos, videos, audio, geotag, search for notes by text and download saved files.
 
-Инструкция и стек: https://github.com/Liaksej/ahj-diplom-client/tree/main/ahj-diplom
+Manual and stack: https://github.com/Liaksej/ahj-diplom-client/tree/main/ahj-diplom
